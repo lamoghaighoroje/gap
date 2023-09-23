@@ -74,15 +74,15 @@ def evaluate(model,
 
     all_mention_p_ids = torch.tensor([f.mention_p_ids for f in eval_features], dtype=torch.long)
     all_mention_a_ids = torch.tensor([f.mention_a_ids for f in eval_features], dtype=torch.long)
-    all_mention_b_ids = torch.tensor([f.mention_b_ids for f in eval_features], dtype=torch.long)
+    # all_mention_b_ids = torch.tensor([f.mention_b_ids for f in eval_features], dtype=torch.long)
     all_mention_p_mask = torch.tensor([f.mention_p_mask for f in eval_features], dtype=torch.uint8)
     all_mention_a_mask = torch.tensor([f.mention_a_mask for f in eval_features], dtype=torch.uint8)
-    all_mention_b_mask = torch.tensor([f.mention_b_mask for f in eval_features], dtype=torch.uint8)
+    # all_mention_b_mask = torch.tensor([f.mention_b_mask for f in eval_features], dtype=torch.uint8)
 
     all_cluster_ids_a = torch.tensor([f.cluster_ids_a for f in eval_features], dtype=torch.long)
     all_cluster_mask_a = torch.tensor([f.cluster_mask_a for f in eval_features], dtype=torch.uint8)
-    all_cluster_ids_b = torch.tensor([f.cluster_ids_b for f in eval_features], dtype=torch.long)
-    all_cluster_mask_b = torch.tensor([f.cluster_mask_b for f in eval_features], dtype=torch.uint8)
+    # all_cluster_ids_b = torch.tensor([f.cluster_ids_b for f in eval_features], dtype=torch.long)
+    # all_cluster_mask_b = torch.tensor([f.cluster_mask_b for f in eval_features], dtype=torch.uint8)
     all_cluster_ids_p = torch.tensor([f.cluster_ids_p for f in eval_features], dtype=torch.long)
     all_cluster_mask_p = torch.tensor([f.cluster_mask_p for f in eval_features], dtype=torch.uint8)
 
@@ -96,14 +96,14 @@ def evaluate(model,
                                 all_gpr_tags_mask,
                                 all_mention_p_ids,
                                 all_mention_a_ids,
-                                all_mention_b_ids,
+                                # all_mention_b_ids,
                                 all_mention_p_mask,
                                 all_mention_a_mask,
-                                all_mention_b_mask,
+                                # all_mention_b_mask,
                                 all_cluster_ids_a,
                                 all_cluster_mask_a,
-                                all_cluster_ids_b,
-                                all_cluster_mask_b,
+                                # all_cluster_ids_b,
+                                # all_cluster_mask_b,
                                 all_cluster_ids_p,
                                 all_cluster_mask_p,
                                 all_pretrained,
@@ -124,12 +124,10 @@ def evaluate(model,
         for step, batch in enumerate(eval_dataloader):
             # with torch.cuda.device(0):
             batch = tuple(t.to(device) for t in batch)
-            (input_ids, input_mask, segment_ids, 
-                gpr_tags_mask,
-                mention_p_ids, mention_a_ids, mention_b_ids,
-                mention_p_mask, mention_a_mask, mention_b_mask,
-                cluster_ids_a, cluster_mask_a, cluster_ids_b, cluster_mask_b,
-                cluster_ids_p, cluster_mask_p, pretrained, label_ids) = batch
+            (input_ids, input_mask, segment_ids,gpr_tags_mask,
+                mention_p_ids, mention_a_ids,mention_p_mask, mention_a_mask,
+                cluster_ids_a, cluster_mask_a,cluster_ids_p, cluster_mask_p,
+                pretrained, label_ids) = batch
 
             with torch.no_grad():
                 res = model(input_ids, 
@@ -138,14 +136,10 @@ def evaluate(model,
                                 gpr_tags_mask=gpr_tags_mask,
                                 mention_p_ids=mention_p_ids,
                                 mention_a_ids=mention_a_ids,
-                                mention_b_ids=mention_b_ids,
                                 mention_p_mask=mention_p_mask,
-                                mention_a_mask=mention_a_mask,
-                                mention_b_mask=mention_b_mask, 
+                                mention_a_mask=mention_a_mask, 
                                 cluster_ids_a=cluster_ids_a,
                                 cluster_mask_a=cluster_mask_a,
-                                cluster_ids_b=cluster_ids_b,
-                                cluster_mask_b=cluster_mask_b,
                                 cluster_ids_p=cluster_ids_p,
                                 cluster_mask_p=cluster_mask_p,
                                 pretrained=pretrained,
@@ -215,15 +209,15 @@ def fit(model,
 
     all_mention_p_ids = torch.tensor([f.mention_p_ids for f in train_features], dtype=torch.long)
     all_mention_a_ids = torch.tensor([f.mention_a_ids for f in train_features], dtype=torch.long)
-    all_mention_b_ids = torch.tensor([f.mention_b_ids for f in train_features], dtype=torch.long)
+    # all_mention_b_ids = torch.tensor([f.mention_b_ids for f in train_features], dtype=torch.long)
     all_mention_p_mask = torch.tensor([f.mention_p_mask for f in train_features], dtype=torch.uint8)
     all_mention_a_mask = torch.tensor([f.mention_a_mask for f in train_features], dtype=torch.uint8)
-    all_mention_b_mask = torch.tensor([f.mention_b_mask for f in train_features], dtype=torch.uint8)
+    # all_mention_b_mask = torch.tensor([f.mention_b_mask for f in train_features], dtype=torch.uint8)
 
     all_cluster_ids_a = torch.tensor([f.cluster_ids_a for f in train_features], dtype=torch.long)
     all_cluster_mask_a = torch.tensor([f.cluster_mask_a for f in train_features], dtype=torch.uint8)
-    all_cluster_ids_b = torch.tensor([f.cluster_ids_b for f in train_features], dtype=torch.long)
-    all_cluster_mask_b = torch.tensor([f.cluster_mask_b for f in train_features], dtype=torch.uint8)
+    # all_cluster_ids_b = torch.tensor([f.cluster_ids_b for f in train_features], dtype=torch.long)
+    # all_cluster_mask_b = torch.tensor([f.cluster_mask_b for f in train_features], dtype=torch.uint8)
     all_cluster_ids_p = torch.tensor([f.cluster_ids_p for f in train_features], dtype=torch.long)
     all_cluster_mask_p = torch.tensor([f.cluster_mask_p for f in train_features], dtype=torch.uint8)
 
@@ -237,14 +231,14 @@ def fit(model,
                                 all_gpr_tags_mask,
                                 all_mention_p_ids,
                                 all_mention_a_ids,
-                                all_mention_b_ids,
+                                # all_mention_b_ids,
                                 all_mention_p_mask,
                                 all_mention_a_mask,
-                                all_mention_b_mask,
+                                # all_mention_b_mask,
                                 all_cluster_ids_a,
                                 all_cluster_mask_a,
-                                all_cluster_ids_b,
-                                all_cluster_mask_b,
+                                # all_cluster_ids_b,
+                                # all_cluster_mask_b,
                                 all_cluster_ids_p,
                                 all_cluster_mask_p,
                                 all_pretrained,
@@ -301,12 +295,16 @@ def fit(model,
                 # with torch.cuda.device(0):
                 batch = tuple(t.to(device) for t in batch)
                 (input_ids, input_mask, segment_ids,
-                    gpr_tags_mask, 
-                    mention_p_ids, mention_a_ids, mention_b_ids,
-                    mention_p_mask, mention_a_mask, mention_b_mask,
-                    cluster_ids_a, cluster_mask_a, cluster_ids_b, 
-                    cluster_mask_b, cluster_ids_p, cluster_mask_p, 
-                    pretrained, label_ids) = batch
+                    gpr_tags_mask, mention_p_ids, mention_a_ids,
+                    mention_p_mask, mention_a_mask,cluster_ids_a, cluster_mask_a, 
+                    cluster_ids_p, cluster_mask_p, pretrained, label_ids) = batch
+                # (input_ids, input_mask, segment_ids,
+                #     gpr_tags_mask, 
+                #     mention_p_ids, mention_a_ids, mention_b_ids,
+                #     mention_p_mask, mention_a_mask, mention_b_mask,
+                #     cluster_ids_a, cluster_mask_a, cluster_ids_b, 
+                #     cluster_mask_b, cluster_ids_p, cluster_mask_p, 
+                #     pretrained, label_ids) = batch
 
                 # define a new function to compute loss values for both output_modes
                 logits, _ = model(input_ids, 
@@ -315,14 +313,10 @@ def fit(model,
                                     gpr_tags_mask=gpr_tags_mask,
                                     mention_p_ids=mention_p_ids,
                                     mention_a_ids=mention_a_ids,
-                                    mention_b_ids=mention_b_ids,
                                     mention_p_mask=mention_p_mask,
                                     mention_a_mask=mention_a_mask,
-                                    mention_b_mask=mention_b_mask,
                                     cluster_ids_a=cluster_ids_a,
                                     cluster_mask_a=cluster_mask_a,
-                                    cluster_ids_b=cluster_ids_b,
-                                    cluster_mask_b=cluster_mask_b,
                                     cluster_ids_p=cluster_ids_p,
                                     cluster_mask_p=cluster_mask_p,
                                     pretrained=pretrained,
