@@ -25,7 +25,8 @@ class PretrainedProref():
 
         X = X.copy()
 
-        cols = ['tokens', 'clusters', 'pronoun_offset', 'a_span', 'b_span', 'token_to_char_mapping']
+        # cols = ['tokens', 'clusters', 'pronoun_offset', 'a_span', 'b_span', 'token_to_char_mapping']
+        cols = ['tokens', 'clusters', 'pronoun_offset', 'a_span', 'token_to_char_mapping']
         x_cols = set(X.columns).difference(cols)
 
         if syn is not None:

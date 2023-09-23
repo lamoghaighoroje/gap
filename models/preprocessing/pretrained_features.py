@@ -18,10 +18,12 @@ class PretrainedFeatures(BaseEstimator, TransformerMixin):
                       }
                       
         self.models = [self.models[model] for model in models]
+        # self.feats = ['{}_a_coref'.format(model) for model in self.models] + \
+        #                 ['{}_b_coref'.format(model) for model in self.models] + \
+        #                 ['{}_neither_coref'.format(model) for model in self.models]
         self.feats = ['{}_a_coref'.format(model) for model in self.models] + \
-                        ['{}_b_coref'.format(model) for model in self.models] + \
-                        ['{}_neither_coref'.format(model) for model in self.models]
-    
+                    ['{}_neither_coref'.format(model) for model in self.models]
+
     def transform(self, X):
         #X = pd.read_csv(X)
         pretrained = X[self.feats]

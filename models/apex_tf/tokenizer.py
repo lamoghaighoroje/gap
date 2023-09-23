@@ -18,10 +18,11 @@ class Tokenizer(BaseEstimator, TransformerMixin):
             for idx, row in tqdm(X.iterrows(), total=len(X)):
                 res.append(self.tokenizer.tokenize(**row)[1:])
 
-            res = pd.DataFrame(res, columns=['tokens', 'pronoun_offset_token',
-                                                    'a_offset_token', 'b_offset_token', 'a_span',
-                                                    'b_span', 'pronoun_token', 'a_tokens', 'b_tokens'])
-
+            res = pd.DataFrame(res, columns=['tokens', 'pronoun_offset_token','a_offset_token', 'a_span',
+                                              'pronoun_token', 'a_tokens'])
+            # res = pd.DataFrame(res, columns=['tokens', 'pronoun_offset_token',
+            #                                         'a_offset_token', 'b_offset_token', 'a_span',
+            #                                         'b_span', 'pronoun_token', 'a_tokens', 'b_tokens'])
             cols = set(X.columns).difference(res.columns)
             X = pd.concat([X[cols], res], axis=1)
             return AttrDict({'X': X})

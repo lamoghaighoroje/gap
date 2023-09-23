@@ -99,7 +99,8 @@ class Model(BaseEstimator, ClassifierMixin):
             print('Ensembled Test score: ', tst_score)
 
         if test_path:
-            sub_df = pd.DataFrame(np.zeros((len(X_tst), 3)), columns=['A', 'B', 'NEITHER'])
+            # sub_df = pd.DataFrame(np.zeros((len(X_tst), 3)), columns=['A', 'B', 'NEITHER'])
+            sub_df = pd.DataFrame(np.zeros((len(X_tst), 2)), columns=['A', 'NEITHER'])
             self.save_submission(sub_sample_path, 
                                 'submissions/', 
                                 tst_probs, 
@@ -286,7 +287,8 @@ class Model(BaseEstimator, ClassifierMixin):
             # just a hack, the test results are as if there was only one fold
             n_folds = 1
             sub_path = None
-            sub_df = pd.DataFrame(np.zeros((len(X), 3)), columns=['A', 'B', 'NEITHER'])
+            # sub_df = pd.DataFrame(np.zeros((len(X), 3)), columns=['A', 'B', 'NEITHER'])
+            sub_df = pd.DataFrame(np.zeros((len(X), 2)), columns=['A', 'NEITHER'])
             
         cols = ['{}_{}_{}'.format(cls, trial, fold) 
                           for trial in range(len(seeds)) 
@@ -374,7 +376,8 @@ class Model(BaseEstimator, ClassifierMixin):
             # just a hack, the test results are as if there was only one fold
             n_folds = 1
             sub_path = None
-            sub_df = pd.DataFrame(np.zeros((len(X), 3)), columns=['A', 'B', 'NEITHER'])
+            # sub_df = pd.DataFrame(np.zeros((len(X), 3)), columns=['A', 'B', 'NEITHER'])
+            sub_df = pd.DataFrame(np.zeros((len(X), 2)), columns=['A', 'NEITHER'])
             
         cols = ['{}_{}_{}_{}'.format(cls, model_idx, trial, fold) 
                         for model_idx in range(len(lms))

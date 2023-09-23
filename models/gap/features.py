@@ -39,14 +39,19 @@ def convert_examples_to_features(examples,
         tokens_ = ["[CLS]"] + tokens + ["[SEP]"]
 
         # first set with gpr tags
-        tokens, _, _, _ = extract_cluster_ids(ex_index, 
+        tokens, _, _ = extract_cluster_ids(ex_index, 
                                                 tokens_.copy(), 
                                                 n_coref_models, 
                                                 max_mention_len=8,
                                                 remove_gpr_tags=False)
 
         # second without gpr tags only to be used for coref clusters embeddings
-        _, cluster_ids_a, cluster_ids_b, cluster_ids_p = extract_cluster_ids(ex_index, 
+        #  _, cluster_ids_a, cluster_ids_b, cluster_ids_p = extract_cluster_ids(ex_index, 
+        #                                                                     tokens_.copy(), 
+        #                                                                     n_coref_models, 
+        #                                                                     max_mention_len=8,
+        #                                                                     remove_gpr_tags=True)
+        _, cluster_ids_a, cluster_ids_p = extract_cluster_ids(ex_index, 
                                                                             tokens_.copy(), 
                                                                             n_coref_models, 
                                                                             max_mention_len=8,
@@ -67,7 +72,7 @@ def convert_examples_to_features(examples,
         gpr_tags_mask = gpr_tags_mask.tolist()
         mention_p_mask = [1] * len(mention_p_ids)
         mention_a_mask = [1] * len(mention_a_ids)
-        mention_b_mask = [1] * len(mention_b_ids)
+        # mention_b_mask = [1] * len(mention_b_ids)
 
         # Zero-pad up to the max sequence length.
         padding = [pad_value] * (max_seq_length - len(input_ids))
@@ -77,10 +82,10 @@ def convert_examples_to_features(examples,
         gpr_tags_mask += padding
         mention_p_ids += [pad_value] * (max_gpr_mention_len - len(mention_p_ids))
         mention_a_ids += [pad_value] * (max_gpr_mention_len - len(mention_a_ids))
-        mention_b_ids += [pad_value] * (max_gpr_mention_len - len(mention_b_ids))
+        # mention_b_ids += [pad_value] * (max_gpr_mention_len - len(mention_b_ids))
         mention_p_mask += [pad_value] * (max_gpr_mention_len - len(mention_p_mask))
         mention_a_mask += [pad_value] * (max_gpr_mention_len - len(mention_a_mask))
-        mention_b_mask += [pad_value] * (max_gpr_mention_len - len(mention_b_mask))
+        # mention_b_mask += [pad_value] * (max_gpr_mention_len - len(mention_b_mask))
 
         # Zero pad coref clusters
         cluster_ids_a, cluster_mask_a = pad_cluster_ids(cluster_ids_a, n_coref_models, 
@@ -88,11 +93,11 @@ def convert_examples_to_features(examples,
                                                         max_mention_len=8,
                                                         max_coref_mentions=20,
                                                         pad_value=pad_value)
-        cluster_ids_b, cluster_mask_b = pad_cluster_ids(cluster_ids_b, n_coref_models,
-                                                        max_seq_length,
-                                                        max_mention_len=8,
-                                                        max_coref_mentions=20,
-                                                        pad_value=pad_value)
+        # cluster_ids_b, cluster_mask_b = pad_cluster_ids(cluster_ids_b, n_coref_models,
+        #                                                 max_seq_length,
+        #                                                 max_mention_len=8,
+        #                                                 max_coref_mentions=20,
+        #                                                 pad_value=pad_value)
         cluster_ids_p, cluster_mask_p = pad_cluster_ids(cluster_ids_p, n_coref_models, 
                                                         max_seq_length,
                                                         max_mention_len=8,
@@ -119,7 +124,7 @@ def convert_examples_to_features(examples,
             tokens_ = np.array(tokens)[~np.array(gpr_tags_mask).astype(bool)[:len(tokens)]]
             logger.debug("Pronoun tokens: {}".format(tokens_[mention_p_ids][np.array(mention_p_mask).astype(bool)]))
             logger.debug("A tokens: {}".format(tokens_[mention_a_ids][np.array(mention_a_mask).astype(bool)]))
-            logger.debug("B tokens: {}".format(tokens_[mention_b_ids][np.array(mention_b_mask).astype(bool)]))
+            # logger.debug("B tokens: {}".format(tokens_[mention_b_ids][np.array(mention_b_mask).astype(bool)]))
 
             for model_idx in range(n_coref_models):
                 logger.debug("clusters P model {}: {}".format(model_idx, 
@@ -130,18 +135,20 @@ def convert_examples_to_features(examples,
                                                                 [tokens_[mention][np.array(cluster_mask_a).astype(bool)[model_idx][i]].tolist()
                                                                     for i, mention in enumerate(cluster_ids_a[model_idx])]))
 
-                logger.debug("clusters B model {}: {}".format(model_idx, 
-                                                                [tokens_[mention][np.array(cluster_mask_b).astype(bool)[model_idx][i]].tolist()
-                                                                    for i, mention in enumerate(cluster_ids_b[model_idx])]))
+                # logger.debug("clusters B model {}: {}".format(model_idx, 
+                #                                                 [tokens_[mention][np.array(cluster_mask_b).astype(bool)[model_idx][i]].tolist()
+                #                                                     for i, mention in enumerate(cluster_ids_b[model_idx])]))
 
         assert len(tokens) <= max_seq_length, '{}\n{}\n{}'.format(ex_index, len(tokens), tokens)
-        assert ''.join(tokens).upper().count('<P>') == 2 and \
-                    ''.join(tokens).upper().count('<A>') == 2 and \
-                    ''.join(tokens).upper().count('<B>') == 2, (ex_index,
-                                                                "".join(tokens).upper().count('<P>'), 
-                                                                "".join(tokens).upper().count('<A>'),
-                                                                "".join(tokens).upper().count('<B>'), 
-                                                                "".join(tokens))
+        # assert ''.join(tokens).upper().count('<P>') == 2 and \
+        #             ''.join(tokens).upper().count('<A>') == 2 and \
+        #             ''.join(tokens).upper().count('<B>') == 2, (ex_index,
+        #                                                         "".join(tokens).upper().count('<P>'), 
+        #                                                         "".join(tokens).upper().count('<A>'),
+        #                                                         "".join(tokens).upper().count('<B>'), 
+        #                                                         "".join(tokens))
+        assert ''.join(tokens).upper().count('<P>') == 2 and ''.join(tokens).upper().count('<A>') == 2, (ex_index,
+        "".join(tokens).upper().count('<P>'), "".join(tokens).upper().count('<A>'),"".join(tokens))
 
         features.append(
                 AttrDict({'input_ids': input_ids,
@@ -150,14 +157,14 @@ def convert_examples_to_features(examples,
                               'gpr_tags_mask': gpr_tags_mask,
                               'mention_p_ids': mention_p_ids,
                               'mention_a_ids': mention_a_ids,
-                              'mention_b_ids': mention_b_ids,
+                            #   'mention_b_ids': mention_b_ids,
                               'mention_p_mask': mention_p_mask,
                               'mention_a_mask': mention_a_mask,
-                              'mention_b_mask': mention_b_mask,
+                            #   'mention_b_mask': mention_b_mask,
                               'cluster_ids_a': cluster_ids_a,
                               'cluster_mask_a': cluster_mask_a,
-                              'cluster_ids_b': cluster_ids_b,
-                              'cluster_mask_b': cluster_mask_b,
+                            #   'cluster_ids_b': cluster_ids_b,
+                            #   'cluster_mask_b': cluster_mask_b,
                               'cluster_ids_p': cluster_ids_p,
                               'cluster_mask_p': cluster_mask_p,
                               'label_id': example.label,
@@ -233,7 +240,7 @@ def filter_coref_mentions(tokens, cluster_ids, max_mention_len=4):
     mentions = []
     for mention in cluster_ids:
         if len(mention) == 0:
-            print(ex_index, cluster_ids, tokens, mention)
+            print(cluster_ids, tokens, mention)
         token_ids = []
         start = mention[0]
         while start < mention[-1]+1:
@@ -283,7 +290,7 @@ def extract_cluster_ids(ex_index, tokens, n_coref_models, max_mention_len=4, rem
         start += 1
 
     cluster_ids_a = [[[]] for i in range(n_coref_models)]
-    cluster_ids_b = [[[]] for i in range(n_coref_models)]
+    # cluster_ids_b = [[[]] for i in range(n_coref_models)]
     cluster_ids_p = [[[]] for i in range(n_coref_models)]
     tokens_to_remove = []
     for (token_ids, token) in map_idx_to_token:
@@ -295,10 +302,10 @@ def extract_cluster_ids(ex_index, tokens, n_coref_models, max_mention_len=4, rem
                 cluster_ids_a[coref_model_idx], tokens_to_remove = populate_cluster(cluster_ids_a[coref_model_idx], 
                                                                                     tokens_to_remove, 
                                                                                     token_ids)
-            if 'D' in token:
-                cluster_ids_b[coref_model_idx], tokens_to_remove = populate_cluster(cluster_ids_b[coref_model_idx], 
-                                                                                    tokens_to_remove, 
-                                                                                    token_ids)
+            # if 'D' in token:
+            #     cluster_ids_b[coref_model_idx], tokens_to_remove = populate_cluster(cluster_ids_b[coref_model_idx], 
+            #                                                                         tokens_to_remove, 
+            #                                                                         token_ids)
             if 'E' in token:
                 cluster_ids_p[coref_model_idx], tokens_to_remove = populate_cluster(cluster_ids_p[coref_model_idx], 
                                                                                     tokens_to_remove, 
@@ -310,7 +317,7 @@ def extract_cluster_ids(ex_index, tokens, n_coref_models, max_mention_len=4, rem
         #     logger.info((ex_index, i, cluster_ids_b[i]))
         #     logger.info((ex_index, i, cluster_ids_p[i]))
         cluster_ids_a[i].pop()
-        cluster_ids_b[i].pop()
+        # cluster_ids_b[i].pop()
         cluster_ids_p[i].pop()
 
     # remove coref tags from tokens
@@ -321,10 +328,11 @@ def extract_cluster_ids(ex_index, tokens, n_coref_models, max_mention_len=4, rem
     # filter out coref mention that are either a gpr tag or has tokens more than 6
     for i in range(n_coref_models):
         cluster_ids_a[i] = filter_coref_mentions(tokens, cluster_ids_a[i], max_mention_len=max_mention_len)
-        cluster_ids_b[i] = filter_coref_mentions(tokens, cluster_ids_b[i], max_mention_len=max_mention_len)
+        # cluster_ids_b[i] = filter_coref_mentions(tokens, cluster_ids_b[i], max_mention_len=max_mention_len)
         cluster_ids_p[i] = filter_coref_mentions(tokens, cluster_ids_p[i], max_mention_len=max_mention_len)
 
-    return tokens, cluster_ids_a, cluster_ids_b, cluster_ids_p
+    # return tokens, cluster_ids_a, cluster_ids_b, cluster_ids_p
+    return tokens, cluster_ids_a, cluster_ids_p
 
 def remove_first_matching_tag(tokens, tag):
     start = 1

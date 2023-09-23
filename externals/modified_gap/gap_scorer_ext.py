@@ -12,9 +12,10 @@ def multiclass_to_gap_score(preds, gold_df, score_df, index=None, verbose=1):
     if score_df is None:
         score_df = pd.DataFrame(columns=['M', 'F', 'B', 'O'])
     
-    preds_df = pd.DataFrame(columns=['id', 'a_coref', 'b_coref'])
+    # preds_df = pd.DataFrame(columns=['id', 'a_coref', 'b_coref'])
+    preds_df = pd.DataFrame(columns=['id', 'a_coref'])
     preds_df['a_coref'] = preds == 0
-    preds_df['b_coref'] = preds == 1
+    # preds_df['neither'] = preds == 1
     preds_df['id'] = gold_df['id']
 
     gold_annotations = read_annotations(gold_df, is_gold=True)
@@ -47,7 +48,8 @@ def add_to_score_view(preds, gold, score_df, index=None, verbose=1):
     if score_df is None:
         score_df = pd.DataFrame(columns=['M', 'F', 'B', 'O'])
     
-    preds = pd.DataFrame(preds, columns=['a_coref', 'b_coref'])
+    # preds = pd.DataFrame(preds, columns=['a_coref', 'b_coref'])
+    preds = pd.DataFrame(preds, columns=['a_coref'])
     preds['id'] = gold['id']
     gold_annotations = read_annotations(gold, is_gold=True)
     system_annotations = read_annotations(preds, is_gold=False)
@@ -91,14 +93,15 @@ def calculate_scores(gold_annotations, system_annotations):
     name_a_annotations = [
         gold_annotation.name_a_coref, system_annotation.name_a_coref
     ]
-    name_b_annotations = [
-        gold_annotation.name_b_coref, system_annotation.name_b_coref
-    ]
+    # name_b_annotations = [
+    #     gold_annotation.name_b_coref, system_annotation.name_b_coref
+    # ]
     for gender in [None, gold_annotation.gender]:
       if gender not in scores:
         scores[gender] = Scores()
 
-      for (gold, system) in [name_a_annotations, name_b_annotations]:
+      # for (gold, system) in [name_a_annotations, name_b_annotations]:
+      for (gold, system) in [name_a_annotations]:
         if system is None:
           print('Missing output for', example_id)
           scores[gender].false_negatives += 1
@@ -124,7 +127,7 @@ def read_annotations(df, is_gold):
         continue
 
       annotations[example_id].name_a_coref = row['a_coref']
-      annotations[example_id].name_b_coref = row['b_coref']
+      # annotations[example_id].name_b_coref = row['b_coref']
       if is_gold:
         gender = PRONOUNS.get(row['pronoun'].lower(), Gender.UNKNOWN)
         assert gender != Gender.UNKNOWN, row

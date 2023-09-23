@@ -63,9 +63,11 @@ class GPT2Features(BaseEstimator, TransformerMixin):
         for idx, row in X.iterrows():
             res.append(self.get_sample_props(output.loc[idx], **row)[1:])
         
+        # res = pd.DataFrame(res, columns=['tokens', 'pronoun_offset_token',
+        #                                         'a_offset_token', 'b_offset_token', 'a_span',
+        #                                         'b_span', 'pronoun_token', 'a_tokens', 'b_tokens', 'bert', 'cls'])
         res = pd.DataFrame(res, columns=['tokens', 'pronoun_offset_token',
-                                                'a_offset_token', 'b_offset_token', 'a_span',
-                                                'b_span', 'pronoun_token', 'a_tokens', 'b_tokens', 'bert', 'cls'])
+                                                'a_offset_token', 'a_span', 'pronoun_token', 'a_tokens', 'bert', 'cls'])
         
         cols = set(X.columns).difference(res.columns)
         return {'X': pd.concat([X[cols], res], axis=1)}

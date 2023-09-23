@@ -54,18 +54,18 @@ def data_pipeline(EXPERIMENT_DIR='tmp/exp',
     EXPERIMENT_DIR = str(EXPERIMENT_DIR)
 
     input_reader_step = Step(name='InputReader',
-                               transformer=make_transformer(lambda X, y, pretrained: {'X': X, 'y': y, 'pretrained': pretrained}),
-                               input_data=['input'],
-                               adapter=Adapter({
-                                  'X': E('input', 'X'),
-                                  'y': E('input', 'y'),
-                                  'pretrained': E('input', 'pretrained'),
-                                }),
-                               experiment_directory=EXPERIMENT_DIR,
-                               persist_output=False,
-                               load_persisted_output=False,
-                               is_fittable=False,
-                               force_fitting=False)
+                            transformer=make_transformer(lambda X, y, pretrained: {'X': X, 'y': y, 'pretrained': pretrained}),
+                            input_data=['input'],
+                            adapter=Adapter({
+                                'X': E('input', 'X'),
+                                'y': E('input', 'y'),
+                                'pretrained': E('input', 'pretrained'),
+                            }),
+                            experiment_directory=EXPERIMENT_DIR,
+                            persist_output=False,
+                            load_persisted_output=False,
+                            is_fittable=False,
+                            force_fitting=False)
     input_reader_step._mode = mode
     input_data_step = input_reader_step
 

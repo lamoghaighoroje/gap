@@ -541,18 +541,18 @@ def init_model(X_trn,
     
     if args.do_train:
         return fit(model, 
-                            train_features,
-                            eval_features,
-                            test_features,
-                            label_list,
-                            num_labels, 
-                            tokenizer,
-                            device, 
-                            n_gpu,
-                            args,
-                            swa_model=None,
-                            verbose=verbose
-                            )
+                train_features,
+                eval_features,
+                test_features,
+                label_list,
+                num_labels, 
+                tokenizer,
+                device, 
+                n_gpu,
+                args,
+                swa_model=None,
+                verbose=verbose
+                )
     else:
         # model = BertForSequenceClassification.from_pretrained(args.bert_model, num_labels=num_labels)
         
@@ -562,15 +562,9 @@ def init_model(X_trn,
         config = BertConfig(output_config_file)
 
         if model_version == 'probert':
-            model = ProBERT(config,
-                                                  num_labels=num_labels,
-                                                  pretrained_dim_size=pretrained_dim_size
-                                                )
+            model = ProBERT(config,num_labels=num_labels,pretrained_dim_size=pretrained_dim_size)
         elif model_version == 'grep':
-            model = GREP(config,
-                                                  num_labels=num_labels,
-                                                  pretrained_dim_size=pretrained_dim_size
-                                                )
+            model = GREP(config,num_labels=num_labels,pretrained_dim_size=pretrained_dim_size)
 
         if torch.cuda.is_available():
             map_location=lambda storage, loc: storage.cuda()
