@@ -1,5 +1,5 @@
 # Byte-compiled / optimized / DLL files
-__pycache__/
+*/__pycache__/*
 *.py[cod]
 *$py.class
 
@@ -105,8 +105,9 @@ venv.bak/
 
 .DS_Store
 
-externals/stanford-corenlp-full-2018-10-05/
+externals/stanford-corenlp-full-2018-10-05/*
 externals/data/*.tar.gz
 externals/data/glove*
 externals/data/model*
 results/
+*.cpython-37.pyc
