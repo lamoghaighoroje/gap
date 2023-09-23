@@ -43,7 +43,8 @@ def simple_accuracy(preds, labels):
     return (preds == labels).mean()
 
 def acc_and_f1(preds, y_true, label_list):
-    label_list = [0, 1, 2]
+    # label_list = [0, 1, 2]
+    label_list = [0, 1]
     acc = simple_accuracy(np.argmax(preds, axis=-1), y_true)
     f1 = f1_score(y_true=y_true, y_pred=np.argmax(preds, axis=-1), average='micro', labels=label_list)
     return {
