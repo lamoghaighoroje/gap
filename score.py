@@ -106,7 +106,8 @@ def load_data_version(data_dir=None,
 
 def get_score(probs, data):
     y_true = data['label']
-    return round(log_loss(y_true, probs[:len(y_true), :])*100, 3)
+    # return round(log_loss(y_true, probs[:len(y_true), :])*100, 3)
+    return round(log_loss(y_true, probs[:len(y_true), :])*100, 2)
 
 def get_val_scores(predictions, 
                    lms, 

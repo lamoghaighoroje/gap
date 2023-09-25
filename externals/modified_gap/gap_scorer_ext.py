@@ -13,9 +13,9 @@ def multiclass_to_gap_score(preds, gold_df, score_df, index=None, verbose=1):
         score_df = pd.DataFrame(columns=['M', 'F', 'B', 'O'])
     
     # preds_df = pd.DataFrame(columns=['id', 'a_coref', 'b_coref'])
-    preds_df = pd.DataFrame(columns=['id', 'a_coref'])
+    preds_df = pd.DataFrame(columns=['id', 'a_coref', 'neither'])
     preds_df['a_coref'] = preds == 0
-    # preds_df['neither'] = preds == 1
+    preds_df['neither'] = preds == 1
     preds_df['id'] = gold_df['id']
 
     gold_annotations = read_annotations(gold_df, is_gold=True)
@@ -49,7 +49,7 @@ def add_to_score_view(preds, gold, score_df, index=None, verbose=1):
         score_df = pd.DataFrame(columns=['M', 'F', 'B', 'O'])
     
     # preds = pd.DataFrame(preds, columns=['a_coref', 'b_coref'])
-    preds = pd.DataFrame(preds, columns=['a_coref'])
+    preds = pd.DataFrame(preds, columns=['a_coref', 'neither'])
     preds['id'] = gold['id']
     gold_annotations = read_annotations(gold, is_gold=True)
     system_annotations = read_annotations(preds, is_gold=False)

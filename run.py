@@ -232,8 +232,8 @@ def main():
                 max_seq_length=512,
                 train_batch_size=6,
                 eval_batch_size=32,
-                learning_rate=4e-6,
-                num_train_epochs=20,
+                learning_rate=3e-4,
+                num_train_epochs=4,
                 patience=3,
                 verbose=args.verbose,
                 force=args.force

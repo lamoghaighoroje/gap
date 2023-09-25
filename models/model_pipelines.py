@@ -30,9 +30,10 @@ logger.propagate = False
 tf.logging.set_verbosity(tf.logging.ERROR)
 
 class Model(BaseEstimator, ClassifierMixin):
-    def __init__(self, model=None, name=''):
+    def __init__(self, model=None, name='', labels=[0,1]):
         self.model = model
         self.name = name
+        self.labels = labels
 
     def save_probabilities(self, sub_dir, probs, score, prefix='tst', cols=None):
         probs_df = pd.DataFrame(np.hstack(probs), columns=cols)
@@ -94,7 +95,7 @@ class Model(BaseEstimator, ClassifierMixin):
         if X_tst is not None:
             probs = tst_probs
             y_true = X_tst['label']
-            tst_score = log_loss(y_true, probs, labels=[0, 1, 2])
+            tst_score = log_loss(y_true, probs, labels=self.labels)
             print('Test scores: ', tst_scores)
             print('Ensembled Test score: ', tst_score)
 
@@ -188,7 +189,7 @@ class Model(BaseEstimator, ClassifierMixin):
             
             probs = np.mean(val_probs, axis=0)
             y_true = X['label']
-            val_score = log_loss(y_true, probs, labels=[0, 1, 2])
+            val_score = log_loss(y_true, probs, labels=self.labels)
         else:
             val_score = np.inf
 
@@ -199,7 +200,7 @@ class Model(BaseEstimator, ClassifierMixin):
         if X_tst is not None:
             probs = np.mean(tst_probs, axis=0)
             y_true = X_tst['label']
-            tst_score = log_loss(y_true, probs, labels=[0, 1, 2])
+            tst_score = log_loss(y_true, probs, labels=self.labels)
             print('Test scores: ', tst_scores)
             print('Mean test score: {} +/- {}'.format(np.mean(tst_scores), np.std(tst_scores)))
             print('Ensembled Test score: ', tst_score)
@@ -212,12 +213,12 @@ class Model(BaseEstimator, ClassifierMixin):
             tst_probs = [val_probs]
             y_true = X['label']
             probs = np.mean(tst_probs, axis=0)
-            tst_score = log_loss(y_true, probs, labels=[0, 1, 2])
+            tst_score = log_loss(y_true, probs, labels=self.labels)
 
         if return_probs:
             return AttrDict(locals())
         
-        return -score
+        return -tst_score
     
     def ensembled_seeds(self,
                     fit_fn,
@@ -270,7 +271,7 @@ class Model(BaseEstimator, ClassifierMixin):
         
         if parameters['do_train']:
           probs = np.mean(val_probs, axis=0)
-          val_score = log_loss(y_true, probs, labels=[0, 1, 2])
+          val_score = log_loss(y_true, probs, labels=self.labels)
 
           print('Repeated bag scores: ', val_scores)
           print('Repeated bag validation scores: {} +/- {}'.format(np.mean(val_scores), np.std(val_scores)))
@@ -280,7 +281,7 @@ class Model(BaseEstimator, ClassifierMixin):
 
         probs = np.mean(tst_probs, axis=0)
         y_true = X_tst['label']
-        tst_score = log_loss(y_true, probs, labels=[0, 1, 2])
+        tst_score = log_loss(y_true, probs, labels=self.labels)
 
         sub_df = None
         if X_tst is None:
@@ -303,7 +304,7 @@ class Model(BaseEstimator, ClassifierMixin):
             print('Bagged ensemble score: ', tst_score)
             return AttrDict(locals())
         
-        return -log_loss(y_true, probs, labels=[0, 1, 2])
+        return -log_loss(y_true, probs, labels=self.labels)
 
     def ensembled_lms(self,
                     fit_fn,
@@ -361,7 +362,7 @@ class Model(BaseEstimator, ClassifierMixin):
 
         if parameters['do_train']:
           probs = np.mean(val_probs, axis=0)
-          val_score = log_loss(y_true, probs, labels=[0, 1, 2])
+          val_score = log_loss(y_true, probs, labels=self.labels)
 
           print('Language model validation scores: ', val_scores)
           print('Language model validation performance: {} +/- {}'.format(np.mean(val_scores), np.std(val_scores)))
@@ -369,7 +370,7 @@ class Model(BaseEstimator, ClassifierMixin):
 
         probs = np.mean(tst_probs, axis=0)
         y_true = X_tst['label']
-        tst_score = log_loss(y_true, probs, labels=[0, 1, 2])
+        tst_score = log_loss(y_true, probs, labels=self.labels)
 
         sub_df = None
         if X_tst is None:
@@ -393,7 +394,7 @@ class Model(BaseEstimator, ClassifierMixin):
             print('Language model ensemble score: ', tst_score)
             return AttrDict(locals())
         
-        return -log_loss(y_true, probs, labels=[0, 1, 2])
+        return -log_loss(y_true, probs, labels=self.labels)
     
     # Defunct
     def hyperopt(self,

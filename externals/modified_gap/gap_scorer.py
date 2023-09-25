@@ -137,7 +137,7 @@ def read_annotations(filename, is_gold):
         continue
 
       annotations[example_id].name_a_coref = is_true(row['A-coref'])
-      annotations[example_id].name_b_coref = is_true(row['B-coref'])
+      # annotations[example_id].name_b_coref = is_true(row['B-coref'])
       if is_gold:
         gender = PRONOUNS.get(row['Pronoun'].lower(), Gender.UNKNOWN)
         assert gender != Gender.UNKNOWN, row

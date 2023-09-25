@@ -247,9 +247,7 @@ def fit(model,
 
     train_sampler = RandomSampler(train_data)
 
-    train_dataloader = DataLoader(train_data, 
-                                    sampler=train_sampler, 
-                                    batch_size=args.train_batch_size)
+    train_dataloader = DataLoader(train_data,sampler=train_sampler,batch_size=args.train_batch_size)
 
     # for name, param in model.named_parameters():
     #     if param.requires_grad:
@@ -519,15 +517,9 @@ def init_model(X_trn,
     print('Preparing Model.')
     cache_dir = str(PYTORCH_PRETRAINED_BERT_CACHE)
     if model_version == 'probert':
-        model = ProBERT.from_pretrained(args.bert_model,
-                                                          cache_dir=cache_dir,
-                                                          num_labels=num_labels
-                                                        )
+        model = ProBERT.from_pretrained(args.bert_model,cache_dir=cache_dir,num_labels=num_labels)
     elif model_version == 'grep':
-        model = GREP.from_pretrained(args.bert_model,
-                                                          cache_dir=cache_dir,
-                                                          num_labels=num_labels
-                                                        )
+        model = GREP.from_pretrained(args.bert_model,cache_dir=cache_dir,num_labels=num_labels)
 
     model.to(device)
 
@@ -557,9 +549,9 @@ def init_model(X_trn,
         config = BertConfig(output_config_file)
 
         if model_version == 'probert':
-            model = ProBERT(config,num_labels=num_labels,pretrained_dim_size=pretrained_dim_size)
+            model = ProBERT(config,num_labels=num_labels)
         elif model_version == 'grep':
-            model = GREP(config,num_labels=num_labels,pretrained_dim_size=pretrained_dim_size)
+            model = GREP(config,num_labels=num_labels)
 
         if torch.cuda.is_available():
             map_location=lambda storage, loc: storage.cuda()

@@ -51,7 +51,7 @@ class Dataset(BaseEstimator, TransformerMixin):
         # else:
         #     y = pd.DataFrame([[False, False]]*len(X), columns=['A', 'B'])
         #     y['NEITHER'] = ~y['A'] & ~y['B']
-        if 'a_coref' in X.columns and 'b_coref' in X.columns:
+        if 'a_coref' in X.columns:
             y = pd.DataFrame(X[['a_coref']].values, columns=['A'])
             y['NEITHER'] = ~y['A']
         else:

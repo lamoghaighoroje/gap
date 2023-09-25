@@ -91,7 +91,7 @@ numpy
 numpydoc
 oauthlib
 opt-einsum
-overrides
+overrides==3.1.0
 packaging
 pandas
 parsimonious
