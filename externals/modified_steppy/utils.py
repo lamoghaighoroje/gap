@@ -1,3 +1,4 @@
+from fileinput import filename
 import logging
 import sys
 
@@ -36,6 +37,7 @@ def initialize_logger():
 
     # console handler
     console_handler = logging.StreamHandler(sys.stdout)
+    # console_handler = logging.FileHandler(filename="gap-externals.log")
     console_handler.setLevel(logging.INFO)
     console_handler.setFormatter(fmt=message_format)
 

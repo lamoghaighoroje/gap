@@ -7,6 +7,7 @@ from tqdm import tqdm
 from attrdict import AttrDict
 
 logging.basicConfig(format = '%(asctime)s - %(levelname)s - %(name)s -   %(message)s',
+                    filename = f'{__name__}.log',
                     datefmt = '%m/%d/%Y %H:%M:%S',
                     level = logging.INFO)
 logger = logging.getLogger(__name__)
@@ -20,9 +21,9 @@ def convert_examples_to_features(examples,
                                     pad_value=0,
                                     verbose=0):
 
-    logger.setLevel(logging.DEBUG)
+    logger.setLevel(logging.INFO)
     if verbose == 0:
-        logger.setLevel(logging.WARNING)
+        logger.setLevel(logging.ERROR)
 
     features = []
     for ex_index, example in tqdm(examples.iterrows(), 
@@ -39,19 +40,14 @@ def convert_examples_to_features(examples,
         tokens_ = ["[CLS]"] + tokens + ["[SEP]"]
 
         # first set with gpr tags
-        tokens, _, _ = extract_cluster_ids(ex_index, 
-                                                tokens_.copy(), 
-                                                n_coref_models, 
-                                                max_mention_len=8,
-                                                remove_gpr_tags=False)
+        tokens, _, _, _ = extract_cluster_ids(ex_index,
+                                           tokens_.copy(),
+                                           n_coref_models,
+                                           max_mention_len=8,
+                                           remove_gpr_tags=False)
 
         # second without gpr tags only to be used for coref clusters embeddings
-        #  _, cluster_ids_a, cluster_ids_b, cluster_ids_p = extract_cluster_ids(ex_index, 
-        #                                                                     tokens_.copy(), 
-        #                                                                     n_coref_models, 
-        #                                                                     max_mention_len=8,
-        #                                                                     remove_gpr_tags=True)
-        _, cluster_ids_a, cluster_ids_p = extract_cluster_ids(ex_index, 
+        _, cluster_ids_a, cluster_ids_b, cluster_ids_p = extract_cluster_ids(ex_index, 
                                                                             tokens_.copy(), 
                                                                             n_coref_models, 
                                                                             max_mention_len=8,
@@ -180,10 +176,11 @@ def get_gpr_mention_ids(tokens, max_gpr_mention_len, ignore_gpr_tags=False):
 
         if token in ['<P>', '<A>', '<B>']:
             gpr_tag_ids += [i, i+1, i+2]
+            gpr_tag_ids_now = [i, i+1, i+2]
 
         if entity is not None and token not in ['<P>', '<A>', '<B>']:
             if ignore_gpr_tags:
-                gpr_ids[entity].append(i+2-len(gpr_tag_ids))
+                gpr_ids[entity].append(i+2-len(gpr_tag_ids_now))
             else:
                 gpr_ids[entity].append(i+2)
 
@@ -192,7 +189,7 @@ def get_gpr_mention_ids(tokens, max_gpr_mention_len, ignore_gpr_tags=False):
                 entity = None
             else:
                 entity = token
-
+    # This is only returning 1 mention id for <P> and 2 for <A>. Think there's a bug here.
     return (gpr_ids['<P>'][:-2][:max_gpr_mention_len], 
             gpr_ids['<A>'][:-2][:max_gpr_mention_len], 
             gpr_ids['<B>'][:-2][:max_gpr_mention_len], 
@@ -290,22 +287,22 @@ def extract_cluster_ids(ex_index, tokens, n_coref_models, max_mention_len=4, rem
         start += 1
 
     cluster_ids_a = [[[]] for i in range(n_coref_models)]
-    # cluster_ids_b = [[[]] for i in range(n_coref_models)]
+    cluster_ids_b = [[[]] for i in range(n_coref_models)]
     cluster_ids_p = [[[]] for i in range(n_coref_models)]
     tokens_to_remove = []
     for (token_ids, token) in map_idx_to_token:
         if token in cluster_tags:
             coref_model_idx = int(token[3])
             # if ex_index < 1:
-                # logger.info((ex_index, token, coref_model_idx))
+            #     logger.info((ex_index, token, coref_model_idx))
             if 'C' in token:
                 cluster_ids_a[coref_model_idx], tokens_to_remove = populate_cluster(cluster_ids_a[coref_model_idx], 
                                                                                     tokens_to_remove, 
                                                                                     token_ids)
-            # if 'D' in token:
-            #     cluster_ids_b[coref_model_idx], tokens_to_remove = populate_cluster(cluster_ids_b[coref_model_idx], 
-            #                                                                         tokens_to_remove, 
-            #                                                                         token_ids)
+            if 'D' in token:
+                cluster_ids_b[coref_model_idx], tokens_to_remove = populate_cluster(cluster_ids_b[coref_model_idx], 
+                                                                                    tokens_to_remove, 
+                                                                                    token_ids)
             if 'E' in token:
                 cluster_ids_p[coref_model_idx], tokens_to_remove = populate_cluster(cluster_ids_p[coref_model_idx], 
                                                                                     tokens_to_remove, 
@@ -317,7 +314,7 @@ def extract_cluster_ids(ex_index, tokens, n_coref_models, max_mention_len=4, rem
         #     logger.info((ex_index, i, cluster_ids_b[i]))
         #     logger.info((ex_index, i, cluster_ids_p[i]))
         cluster_ids_a[i].pop()
-        # cluster_ids_b[i].pop()
+        cluster_ids_b[i].pop()
         cluster_ids_p[i].pop()
 
     # remove coref tags from tokens
@@ -328,11 +325,10 @@ def extract_cluster_ids(ex_index, tokens, n_coref_models, max_mention_len=4, rem
     # filter out coref mention that are either a gpr tag or has tokens more than 6
     for i in range(n_coref_models):
         cluster_ids_a[i] = filter_coref_mentions(tokens, cluster_ids_a[i], max_mention_len=max_mention_len)
-        # cluster_ids_b[i] = filter_coref_mentions(tokens, cluster_ids_b[i], max_mention_len=max_mention_len)
+        cluster_ids_b[i] = filter_coref_mentions(tokens, cluster_ids_b[i], max_mention_len=max_mention_len)
         cluster_ids_p[i] = filter_coref_mentions(tokens, cluster_ids_p[i], max_mention_len=max_mention_len)
 
-    # return tokens, cluster_ids_a, cluster_ids_b, cluster_ids_p
-    return tokens, cluster_ids_a, cluster_ids_p
+    return tokens, cluster_ids_a, cluster_ids_b, cluster_ids_p
 
 def remove_first_matching_tag(tokens, tag):
     start = 1

@@ -43,7 +43,6 @@ def data_pipeline(EXPERIMENT_DIR='tmp/exp',
                     pretrained_proref=False,
                     coref_models=None,
                     persist=False):
-
     if annotate_coref_mentions:
         coref_extractor = CorefExtractor(**coref_models)
         coref_annotator = CorefAnnotator(coref_models.keys())

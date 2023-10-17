@@ -44,16 +44,14 @@ class Dataset(BaseEstimator, TransformerMixin):
         if verbose:
             with pd.option_context('display.max_rows', 10, 'display.max_colwidth', 15):
                 display(X)
-        
-        # if 'a_coref' in X.columns and 'b_coref' in X.columns:
-        #     y = pd.DataFrame(X[['a_coref', 'b_coref']].values, columns=['A', 'B'])
-        #     y['NEITHER'] = ~y['A'] & ~y['B']
-        # else:
-        #     y = pd.DataFrame([[False, False]]*len(X), columns=['A', 'B'])
-        #     y['NEITHER'] = ~y['A'] & ~y['B']
-        if 'a_coref' in X.columns:
-            y = pd.DataFrame(X[['a_coref']].values, columns=['A'])
-            y['NEITHER'] = ~y['A']
+     
+        if 'a_coref' in X.columns or 'b_coref' in X.columns:
+            if 'a_coref' in X.columns:
+                y = pd.DataFrame(X[['a_coref']].values, columns=['A'])
+                y['NEITHER'] = ~y['A']
+            # if 'b_coref' in X.columns:
+            #     y = pd.DataFrame(X[['b_coref']].values, columns=['A'])
+            #     y['NEITHER'] = ~y['A'] 
         else:
             y = pd.DataFrame([[False]]*len(X), columns=['A'])
             y['NEITHER'] = ~y['A']

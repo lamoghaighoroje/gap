@@ -52,8 +52,10 @@ class PronounResolutionModel:
                     for mention in cluster:
                         # some part of token is covered as mention
                         if a_span[0] <= mention[0] and a_span[1] >= mention[1]:
+                            # pred = [True]
                             pred = [True, False]
                         elif b_span[0] <= mention[0] and b_span[1] >= mention[1]:
+                            # pred = [True]
                             pred = [False, True]
 
         if debug:

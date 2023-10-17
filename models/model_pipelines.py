@@ -14,6 +14,7 @@ from datetime import datetime, timedelta
 from pathlib import Path
 
 import pandas as pd
+import os
 import numpy as np
 
 from .base.bayes_opt import BayesianOptimization
@@ -49,8 +50,8 @@ class Model(BaseEstimator, ClassifierMixin):
                 return sub_df
 
         sub_df.loc[:, 'A'] = probabilties[:, 0]
-        sub_df.loc[:, 'B'] = probabilties[:, 1]
-        sub_df.loc[:, 'NEITHER'] = probabilties[:, 2]
+        # sub_df.loc[:, 'B'] = probabilties[:, 1]
+        sub_df.loc[:, 'NEITHER'] = probabilties[:, 1]
 
         save_path = Path(save_path)
         sub_df.to_csv(save_path / "sub_{}_{}.csv".format(str(round(score, 5)).replace('.', '_'),
@@ -89,7 +90,7 @@ class Model(BaseEstimator, ClassifierMixin):
         
         best_epochs, val_probs, val_scores, tst_probs, tst_scores, attn_wts = res
         
-        print('Best validation (early stopping) epochs: ', best_epochs)
+        # print('Best validation (early stopping) epochs: ', best_epochs)
         print('Validation scores: ', val_scores)
         
         if X_tst is not None:
@@ -180,7 +181,8 @@ class Model(BaseEstimator, ClassifierMixin):
         # single fold doesn't have any validation
         if n_folds > 1 and parameters['do_train']:
             # consolidate all out of fold predictions
-            val_probs_ = np.zeros((len(X), 3))
+            # val_probs_ = np.zeros((len(X), 3))
+            val_probs_ = np.zeros((len(X), 2))
             for probs, ids in zip(val_probs, val_ids):
                 val_probs_[ids, :] = probs
             val_probs = [val_probs_.tolist()]
@@ -443,7 +445,7 @@ class Model(BaseEstimator, ClassifierMixin):
 
         log_path = "results/bo_{}_logs.json".format(self.name)
         if os.path.exists(log_path):
-          load_logs(bo, logs=[log_path]);
+          load_logs(bo, logs=[log_path])
         logger = JSONLogger(path=log_path)
         bo.subscribe(Events.OPTMIZATION_STEP, logger)
 

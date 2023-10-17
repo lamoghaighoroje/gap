@@ -120,17 +120,17 @@ def run(verbose=0,
                              test_path=args.test_path,
                              verbose=verbose,
                              parameters = {
-                                                'do_train': args.do_train,
-                                                'do_eval': args.do_eval,
-                                                'max_seq_length': args.max_seq_length,
-                                                'train_batch_size': args.train_batch_size,
-                                                'eval_batch_size': args.eval_batch_size,
-                                                'learning_rate': args.learning_rate,
-                                                'num_train_epochs': args.num_train_epochs,
-                                                'patience': args.patience,
-                                                'model_version': model_version,
-                                                'n_coref_models': len(coref_models)
-                                            }
+                                            'do_train': args.do_train,
+                                            'do_eval': args.do_eval,
+                                            'max_seq_length': args.max_seq_length,
+                                            'train_batch_size': args.train_batch_size,
+                                            'eval_batch_size': args.eval_batch_size,
+                                            'learning_rate': args.learning_rate,
+                                            'num_train_epochs': args.num_train_epochs,
+                                            'patience': args.patience,
+                                            'model_version': model_version,
+                                            'n_coref_models': len(coref_models)
+                                        }
                              )
 
     return res
@@ -202,7 +202,7 @@ def main():
                         type=str)
 
     parser.add_argument("--verbose",
-                        default=0,
+                        default=1,
                         type=int)
 
     parser.add_argument("--force",
@@ -232,9 +232,9 @@ def main():
                 max_seq_length=512,
                 train_batch_size=6,
                 eval_batch_size=32,
-                learning_rate=3e-4,
-                num_train_epochs=4,
-                patience=3,
+                learning_rate=4e-6,
+                num_train_epochs=20,
+                patience=20,
                 verbose=args.verbose,
                 force=args.force
             )

@@ -90,119 +90,140 @@ def init_coref_models(coref_models):
 
     return coref_models
 
-def init_data(data_dir,
-                exp_dir,
+def init_data(data_dir=None,
+                exp_dir=None,
                 persist=True,
                 sanitize_labels=True,
                 annotate_coref_mentions=False,
                 pretrained_proref=False,
                 coref_models=[],
                 test_path=None,
-                verbose=0):
+                verbose=0,
+                mode='train'):
+    if mode == 'inference':
+        print('Transforming data to features.')
+        X_tst_stage2 = None
+        if test_path is not None:
+            test_stage2 = {'input': Dataset().transform(test_path,verbose=verbose)}
+            print("------BEFORE DATA PIPELINE-------",exp_dir)
+            dpl_test_stage2 = data_pipeline(EXPERIMENT_DIR=exp_dir, 
+                            mode='inference', 
+                            annotate_mentions=True, 
+                            annotate_coref_mentions=annotate_coref_mentions, 
+                            pretrained_proref=pretrained_proref,
+                            sanitize_labels=sanitize_labels,
+                            persist=persist,
+                            coref_models=coref_models
+                            )
 
-    train = {
-        'input': Dataset().transform('{}/gap-development.tsv'.format(data_dir), 
-                                    label_corrections='{}/gap_corrections/corrections_dev.csv'.format(data_dir),
-                                    verbose=verbose)
-    }
+            X_tst_stage2 = dpl_test_stage2.gather_step.transform(test_stage2)['X']
 
-    val = {
-        'input': Dataset().transform('{}/gap-validation.tsv'.format(data_dir), 
-                                    label_corrections='{}/gap_corrections/corrections_val.csv'.format(data_dir),
-                                    verbose=verbose)
-    }
-
-    test = {
-        'input': Dataset().transform('{}/gap-test.tsv'.format(data_dir), 
-                                    label_corrections='{}/gap_corrections/corrections_tst.csv'.format(data_dir),
-                                    verbose=verbose)
-    }
-
-    neither = {
-        'input': Dataset().transform('{}/neither.tsv'.format(data_dir),
-                                    verbose=verbose
-                                    )
-    }
-
-    if test_path is not None:
-        test_stage2 = {
-            'input': Dataset().transform(test_path, 
-                                        verbose=verbose
-                                    )
+            print('Transforming data to features done.\n Log a couple of examples for sanity check.\n')
+        return X_tst_stage2
+    else:
+        train = {
+            'input': Dataset().transform('{}/gap-development.tsv'.format(data_dir), 
+                                        label_corrections='{}/gap_corrections/corrections_dev.csv'.format(data_dir),
+                                        verbose=verbose)
         }
-    
-    dpl_trn = data_pipeline(exp_dir, 
-                           mode='train', 
-                           annotate_mentions=True, 
-                           annotate_coref_mentions=annotate_coref_mentions, 
-                           pretrained_proref=pretrained_proref,
-                           sanitize_labels=sanitize_labels,
-                           persist=persist,
-                           coref_models=coref_models
-                        )
-    dpl_val = data_pipeline(exp_dir, 
-                           mode='val', 
-                           annotate_mentions=True, 
-                           annotate_coref_mentions=annotate_coref_mentions, 
-                           pretrained_proref=pretrained_proref,
-                           sanitize_labels=sanitize_labels,
-                           persist=persist,
-                           coref_models=coref_models
-                        )
-    dpl_tst = data_pipeline(exp_dir, 
-                           mode='test', 
-                           annotate_mentions=True, 
-                           annotate_coref_mentions=annotate_coref_mentions, 
-                           pretrained_proref=pretrained_proref,
-                           sanitize_labels=sanitize_labels,
-                           persist=persist,
-                           coref_models=coref_models
-                        )
 
-    dpl_neither = data_pipeline(exp_dir, 
-                           mode='neither', 
-                           annotate_mentions=True, 
-                           annotate_coref_mentions=annotate_coref_mentions, 
-                           pretrained_proref=pretrained_proref,
-                           sanitize_labels=sanitize_labels,
-                           persist=persist,
-                           coref_models=coref_models
-                        )
+        val = {
+            'input': Dataset().transform('{}/gap-validation.tsv'.format(data_dir), 
+                                        label_corrections='{}/gap_corrections/corrections_val.csv'.format(data_dir),
+                                        verbose=verbose)
+        }
 
-    display(dpl_trn.gather_step)
+        test = {
+            'input': Dataset().transform('{}/gap-test.tsv'.format(data_dir), 
+                                        label_corrections='{}/gap_corrections/corrections_tst.csv'.format(data_dir),
+                                        verbose=verbose)
+        }
 
-    logger.info('Transforming data to features.')
+        neither = {
+            'input': Dataset().transform('{}/neither.tsv'.format(data_dir),
+                                        verbose=verbose
+                                        )
+        }
 
-    X_trn = dpl_trn.gather_step.transform(train)['X']
-    X_val = dpl_val.gather_step.transform(val)['X']
-    X_tst = dpl_tst.gather_step.transform(test)['X']
-    X_neither = dpl_neither.gather_step.transform(neither)['X']
-    X_tst_stage2 = None
+        if test_path is not None:
+            test_stage2 = {
+                'input': Dataset().transform(test_path, 
+                                            verbose=verbose
+                                        )
+            }
+        
+        dpl_trn = data_pipeline(exp_dir, 
+                            mode='train', 
+                            annotate_mentions=True, 
+                            annotate_coref_mentions=annotate_coref_mentions, 
+                            pretrained_proref=pretrained_proref,
+                            sanitize_labels=sanitize_labels,
+                            persist=persist,
+                            coref_models=coref_models
+                            )
+        dpl_val = data_pipeline(exp_dir, 
+                            mode='val', 
+                            annotate_mentions=True, 
+                            annotate_coref_mentions=annotate_coref_mentions, 
+                            pretrained_proref=pretrained_proref,
+                            sanitize_labels=sanitize_labels,
+                            persist=persist,
+                            coref_models=coref_models
+                            )
+        dpl_tst = data_pipeline(exp_dir, 
+                            mode='test', 
+                            annotate_mentions=True, 
+                            annotate_coref_mentions=annotate_coref_mentions, 
+                            pretrained_proref=pretrained_proref,
+                            sanitize_labels=sanitize_labels,
+                            persist=persist,
+                            coref_models=coref_models
+                            )
 
-    if test_path is not None:
-        dpl_test_stage2 = data_pipeline(exp_dir, 
-                           mode='inference', 
-                           annotate_mentions=True, 
-                           annotate_coref_mentions=annotate_coref_mentions, 
-                           pretrained_proref=pretrained_proref,
-                           sanitize_labels=sanitize_labels,
-                           persist=persist,
-                           coref_models=coref_models
-                        )
-        X_tst_stage2 = dpl_test_stage2.gather_step.transform(test_stage2)['X']
+        dpl_neither = data_pipeline(exp_dir, 
+                            mode='neither', 
+                            annotate_mentions=True, 
+                            annotate_coref_mentions=annotate_coref_mentions, 
+                            pretrained_proref=pretrained_proref,
+                            sanitize_labels=sanitize_labels,
+                            persist=persist,
+                            coref_models=coref_models
+                            )
 
-    logger.info('Transforming data to features done.\n Log a couple of examples for sanity check.\n')
+        display(dpl_trn.gather_step)
 
-    print(X_trn.loc[0].text)
-    print(X_trn.loc[0])
+        logger.info('Transforming data to features.')
 
-    print(X_tst.loc[0].text)
-    print(X_tst.loc[0])
+        X_trn = dpl_trn.gather_step.transform(train)['X']
+        X_val = dpl_val.gather_step.transform(val)['X']
+        X_tst = dpl_tst.gather_step.transform(test)['X']
+        X_neither = dpl_neither.gather_step.transform(neither)['X']
+        X_tst_stage2 = None
 
-    print(X_neither.loc[0].text)
-    print(X_neither.loc[0])
+        if test_path is not None:
+            dpl_test_stage2 = data_pipeline(exp_dir, 
+                            mode='inference', 
+                            annotate_mentions=True, 
+                            annotate_coref_mentions=annotate_coref_mentions, 
+                            pretrained_proref=pretrained_proref,
+                            sanitize_labels=sanitize_labels,
+                            persist=persist,
+                            coref_models=coref_models
+                            )
+            X_tst_stage2 = dpl_test_stage2.gather_step.transform(test_stage2)['X']
 
-    return X_trn, X_val, X_tst, X_neither, X_tst_stage2
+        logger.info('Transforming data to features done.\n Log a couple of examples for sanity check.\n')
+
+        print(X_trn.loc[0].text)
+        print(X_trn.loc[0])
+
+        print(X_tst.loc[0].text)
+        print(X_tst.loc[0])
+
+        print(X_neither.loc[0].text)
+        print(X_neither.loc[0])
+
+        return X_trn, X_val, X_tst, X_neither, X_tst_stage2
 
 # def do_lm_ensemble(predictions_paths,
 #                     lms,

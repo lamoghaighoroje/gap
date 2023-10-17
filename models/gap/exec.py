@@ -36,6 +36,7 @@ from scipy.special import softmax
 
 logging.basicConfig(format = '%(asctime)s - %(levelname)s - %(name)s -   %(message)s',
                     datefmt = '%m/%d/%Y %H:%M:%S',
+                    filename= 'exec.log',
                     level = logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -61,7 +62,7 @@ def compute_metrics(preds, labels, label_list):
 def evaluate(model,
             eval_features,
             device, 
-            args, 
+            eval_batch_size,
             label_list,
             num_labels,
             eval_mode=False):
@@ -114,7 +115,7 @@ def evaluate(model,
     eval_sampler = SequentialSampler(eval_data)
     eval_dataloader = DataLoader(eval_data, 
                                 sampler=eval_sampler, 
-                                batch_size=args.eval_batch_size)
+                                batch_size=eval_batch_size)
 
     eval_loss = 0
     nb_eval_steps = 0
@@ -161,15 +162,15 @@ def evaluate(model,
             if len(preds) == 0:
                 preds.append(probabilties.detach().cpu().numpy())
             else:
-                preds[0] = np.append(
-                    preds[0], probabilties.detach().cpu().numpy(), axis=0)
+                preds[0] = np.append(preds[0], probabilties.detach().cpu().numpy(), axis=0)
 
             if eval_mode:
                 pbar.set_description('Evaluating, Loss={:.3f}'.format(eval_loss / nb_eval_steps))
                 pbar.update()
 
                 if len(attn_wts) == 0:
-                    attn_wts = [attn_wts_m, attn_wts_c, attn_wts_co]
+                    # attn_wts = [attn_wts_m, attn_wts_c, attn_wts_co]
+                    attn_wts = [attn_wts_m, attn_wts_c]
                 else:
                     attn_wts[0] = np.append(attn_wts[0], attn_wts_m, axis=0)
                     attn_wts[1] = np.append(attn_wts[1], attn_wts_c, axis=0)
@@ -297,13 +298,6 @@ def fit(model,
                     gpr_tags_mask, mention_p_ids, mention_a_ids,
                     mention_p_mask, mention_a_mask,cluster_ids_a, cluster_mask_a, 
                     cluster_ids_p, cluster_mask_p, pretrained, label_ids) = batch
-                # (input_ids, input_mask, segment_ids,
-                #     gpr_tags_mask, 
-                #     mention_p_ids, mention_a_ids, mention_b_ids,
-                #     mention_p_mask, mention_a_mask, mention_b_mask,
-                #     cluster_ids_a, cluster_mask_a, cluster_ids_b, 
-                #     cluster_mask_b, cluster_ids_p, cluster_mask_p, 
-                #     pretrained, label_ids) = batch
 
                 # define a new function to compute loss values for both output_modes
                 logits, _ = model(input_ids, 
@@ -345,16 +339,11 @@ def fit(model,
                                                                                 np.inf))
                 pbar.update(len(batch[0]))
 
-                # if global_step % (500//args.train_batch_size) == 0 and global_step > 0:
-                #     break
-
-                # if nb_tr_steps % (500//args.train_batch_size) == 0 and nb_tr_steps > 0:
-                #     break
         
             preds_, score, res, _ = evaluate(model,
                                         eval_features,
                                         device, 
-                                        args, 
+                                        args.eval_batch_size, 
                                         label_list,
                                         num_labels)
 
@@ -369,7 +358,7 @@ def fit(model,
                 preds_swa, swa_score, _, _ = evaluate(swa_model,
                                             eval_features,
                                             device, 
-                                            args, 
+                                            args.eval_batch_size, 
                                             label_list,
                                             num_labels)
                 if swa_score < best_swa_score:
@@ -385,7 +374,7 @@ def fit(model,
                     tst_preds_, tst_score, tst_res, _ = evaluate(model,
                                                 test_features,
                                                 device, 
-                                                args, 
+                                                args.eval_batch_size, 
                                                 label_list,
                                                 num_labels)
 
@@ -564,7 +553,7 @@ def init_model(X_trn,
         tst_preds, tst_score, _, attn_wts = evaluate(model,
                         test_features,
                         device, 
-                        args, 
+                        args.eval_batch_size, 
                         label_list,
                         num_labels,
                         eval_mode=True)
@@ -582,7 +571,7 @@ def fit_fold(fold_n,
 
     logger_level = logging.INFO
     if verbose == 0:
-        logger_level = logging.WARNING
+        logger_level = logging.ERROR
     logger.setLevel(logger_level)
     logging.getLogger('pytorch_pretrained_bert.tokenization').setLevel(logger_level)
     logging.getLogger('pytorch_pretrained_bert.modeling').setLevel(logger_level)
