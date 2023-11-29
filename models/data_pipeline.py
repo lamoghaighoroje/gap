@@ -106,7 +106,8 @@ def data_pipeline(EXPERIMENT_DIR='tmp/exp',
                                  input_data=['input'],
                                  adapter=Adapter({
                                   'X': E('input', 'X'),
-                                  'corrections': E('input', 'label_corrections')
+                                  'corrections': E('input', 'label_corrections'),
+                                  'y': E('input', 'y')
                                  }),
                                  experiment_directory=EXPERIMENT_DIR,
                                  persist_output=False,

@@ -117,8 +117,8 @@ def convert_examples_to_features(examples,
             tokens_ = np.array(tokens)
             logger.debug("GPR tags mask: {}".format(tokens_[np.array(gpr_tags_mask).astype(bool)[:len(tokens_)]]))
 
-            tokens_ = np.array(tokens)[~np.array(gpr_tags_mask).astype(bool)[:len(tokens)]]
-            logger.debug("Pronoun tokens: {}".format(tokens_[mention_p_ids][np.array(mention_p_mask).astype(bool)]))
+            # tokens_ = np.array(tokens)[~np.array(gpr_tags_mask).astype(bool)[:len(tokens)]]
+            logger.debug("Pronoun tokens: {}".format(tokens_[mention_p_ids][np.array(mention_p_mask).astype(bool)[:len(tokens_)]]))
             logger.debug("A tokens: {}".format(tokens_[mention_a_ids][np.array(mention_a_mask).astype(bool)]))
             # logger.debug("B tokens: {}".format(tokens_[mention_b_ids][np.array(mention_b_mask).astype(bool)]))
 
@@ -190,7 +190,8 @@ def get_gpr_mention_ids(tokens, max_gpr_mention_len, ignore_gpr_tags=False):
             else:
                 entity = token
     # This is only returning 1 mention id for <P> and 2 for <A>. Think there's a bug here.
-    return (gpr_ids['<P>'][:-2][:max_gpr_mention_len], 
+    return (gpr_ids['<P>'][:][:max_gpr_mention_len], 
+            # gpr_ids['<P>'][:-2][:max_gpr_mention_len], 
             gpr_ids['<A>'][:-2][:max_gpr_mention_len], 
             gpr_ids['<B>'][:-2][:max_gpr_mention_len], 
             gpr_tag_ids)
