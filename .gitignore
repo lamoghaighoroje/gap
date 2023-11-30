@@ -111,5 +111,5 @@ externals/data/glove*
 externals/data/model*
 results/
 *.cpython-37.pyc
-models/__pycache__/
+*/__pycache__/
 *.pyc

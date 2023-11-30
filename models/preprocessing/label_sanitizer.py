@@ -6,7 +6,7 @@ class LabelSanitizer(BaseEstimator, TransformerMixin):
     def __init__(self, sanitize_labels):
         self.sanitize_labels = sanitize_labels
 
-    def transform(self, X, corrections, y):
+    def transform(self, X, corrections):
         X = X.copy(deep=True)
 
         if not self.sanitize_labels:
@@ -19,30 +19,23 @@ class LabelSanitizer(BaseEstimator, TransformerMixin):
             ids = corrections[mask]['id'].values
             ids = [id for id in ids if id in X.index]
             X.loc[ids, ['a_coref', 'b_coref']] = [True, False]
-            # since A contains 2 X 2 of [[line_a_coref, neither],[line_b_coref, neither]]
-            for id in ids:
-                y.loc[id, ['A', 'NEITHER']] = [[True, False], [False, True]]
-
+            
             mask = corrections['label'].str.lower().str.contains('\(b\)')
             ids = corrections[mask]['id'].values
             ids = [id for id in ids if id in X.index]
             X.loc[ids, ['a_coref', 'b_coref']] = [False, True]
-            for id in ids:
-                y.loc[id, ['A', 'NEITHER']] = [[False, True], [True, False]]
-
+            
             mask = corrections['label'].str.lower().str.contains('neither')
             ids = corrections[mask]['id'].values
             ids = [id for id in ids if id in X.index]
             X.loc[ids, ['a_coref', 'b_coref']] = [False, False]
-            for id in ids:
-                y.loc[id, ['A', 'NEITHER']] = [[False, False], [True, True]]
+           
+        if 'a_coref' in X.columns or 'b_coref' in X.columns:
+            if 'a_coref' in X.columns:
+                y = pd.DataFrame(X[['a_coref']].values, columns=['A'])
+                y['NEITHER'] = ~y['A'] 
         else:
-            if 'a_coref' in X.columns or 'b_coref' in X.columns:
-                if 'a_coref' in X.columns:
-                    y = pd.DataFrame(X[['a_coref']].values, columns=['A'])
-                    y['NEITHER'] = ~y['A'] 
-            else:
-                y = pd.DataFrame([[False]]*len(X), columns=['A'])
-                y['NEITHER'] = ~y['A']
+            y = pd.DataFrame([[False]]*len(X), columns=['A'])
+            y['NEITHER'] = ~y['A']
 
         return {'X': X, 'y': y}
