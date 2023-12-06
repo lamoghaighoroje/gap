@@ -145,12 +145,8 @@ def init_data(data_dir=None,
                                         )
         }
 
-        # if test_path is not None:
-        #     test_stage2 = {
-        #         'input': Dataset().transform(test_path, 
-        #                                     verbose=verbose
-        #                                 )
-        #     }
+        if test_path is not None:
+            test_stage2 = {'input': Dataset().transform(test_path,verbose=verbose)}
         
         dpl_trn = data_pipeline(exp_dir, 
                             mode='train', 
@@ -201,17 +197,16 @@ def init_data(data_dir=None,
         X_neither = dpl_neither.gather_step.transform(neither)['X']
         X_tst_stage2 = None
 
-        # if test_path is not None:
-        #     dpl_test_stage2 = data_pipeline(exp_dir, 
-        #                     mode='inference', 
-        #                     annotate_mentions=True, 
-        #                     annotate_coref_mentions=annotate_coref_mentions, 
-        #                     pretrained_proref=pretrained_proref,
-        #                     sanitize_labels=sanitize_labels,
-        #                     persist=persist,
-        #                     coref_models=coref_models
-        #                     )
-        #     X_tst_stage2 = dpl_test_stage2.gather_step.transform(test_stage2)['X']
+        if test_path is not None:
+            dpl_test_stage2 = data_pipeline(exp_dir, 
+                            annotate_mentions=True, 
+                            annotate_coref_mentions=annotate_coref_mentions, 
+                            pretrained_proref=pretrained_proref,
+                            sanitize_labels=sanitize_labels,
+                            persist=persist,
+                            coref_models=coref_models
+                            )
+            X_tst_stage2 = dpl_test_stage2.gather_step.transform(test_stage2)['X']
 
         logger.info('Transforming data to features done.\n Log a couple of examples for sanity check.\n')
 

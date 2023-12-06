@@ -84,7 +84,7 @@ def run(verbose=0,
                                                     X_tst, 
                                                     X_neither]).reset_index(drop=True),
                                         None,
-                                        X_tst=X_inference,
+                                        X_tst=X_tst,
                                         seeds=args.seeds,
                                         n_folds=args.n_folds,
                                         lms=args.lms,
@@ -233,7 +233,7 @@ def main():
                 eval_batch_size=32,
                 learning_rate=4e-6,
                 num_train_epochs=20,
-                patience=20,
+                patience=4,
                 verbose=args.verbose,
                 force=args.force
             )

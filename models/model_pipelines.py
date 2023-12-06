@@ -173,7 +173,7 @@ class Model(BaseEstimator, ClassifierMixin):
         else:
             res = workers
 
-        best_epochs, val_probs, val_scores, tst_probs, tst_scores = zip(*res)
+        best_epochs, val_probs, val_scores, tst_probs, tst_scores, attn_wts = zip(*res)
         
         SUBMISSION_DIR = exp_dir / 'submission'
         SUBMISSION_DIR.mkdir(parents=True, exist_ok=True)
@@ -356,6 +356,7 @@ class Model(BaseEstimator, ClassifierMixin):
             val_scores.append(res.val_scores)
             scores.append(res.tst_score)
             print('Language model {} done in {}\n'.format(model, timedelta(seconds=int(timer()-start))))
+            logger.info('Language model {} done in {}\n'.format(model, timedelta(seconds=int(timer()-start))))
 
         if X is None:
           y_true = X_tst['label']
@@ -369,6 +370,9 @@ class Model(BaseEstimator, ClassifierMixin):
           print('Language model validation scores: ', val_scores)
           print('Language model validation performance: {} +/- {}'.format(np.mean(val_scores), np.std(val_scores)))
           print('Language model ensemble validation score: ', val_score)
+          logger.info(f'Language model validation scores: {val_scores}')
+          logger.info('Language model validation performance: {} +/- {}'.format(np.mean(val_scores), np.std(val_scores)))
+          logger.info(f'Language model ensemble validation score: {val_score}')
 
         probs = np.mean(tst_probs, axis=0)
         y_true = X_tst['label']

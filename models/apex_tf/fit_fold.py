@@ -48,7 +48,9 @@ def fit_fold(fold_n, ckpt, model, X_trn, X_val, X_tst, batch_size, verbose, seed
 
      tst_score = log_loss(y_true_tst, probs_tst)
      if verbose:
-          print('Fold {} done in {}s. Test score - {}'.format(fold_n, int(timer()-start), tst_score))
+          msg = 'Fold {} done in {}s. Test score - {}'.format(fold_n, int(timer()-start), tst_score)
+          print(msg)
+          logger.info(msg)
 
      return model.best_score, model.best_score_epoch, y_true_tst, probs_tst, tst_score
 

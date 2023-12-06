@@ -595,10 +595,9 @@ def fit_fold(fold_n,
                                                                         output_dir=OUTPUT_DIR,
                                                                         verbose=verbose, 
                                                                         **args)
-
-    print('Fold {} done in {}. \nTest score - {}'.format(fold_n, 
-                                                        timedelta(seconds=int(timer()-start)), 
-                                                        tst_score))
+    msg = 'Fold {} done in {}. \nTest score - {}'.format(fold_n,timedelta(seconds=int(timer()-start)),tst_score)
+    print(msg)
+    logger.info(msg)
 
     if not len(X_tst):
         tst_preds = val_preds
