@@ -48,15 +48,15 @@ class Model(BaseEstimator, ClassifierMixin):
             sub_df = pd.read_csv(sample_path)
             if len(sub_df) != len(probabilties):
                 return sub_df
+        if sub_df != None:
+          sub_df.loc[:, 'A'] = probabilties[:, 0]
+          # sub_df.loc[:, 'B'] = probabilties[:, 1]
+          sub_df.loc[:, 'NEITHER'] = probabilties[:, 1]
 
-        sub_df.loc[:, 'A'] = probabilties[:, 0]
-        # sub_df.loc[:, 'B'] = probabilties[:, 1]
-        sub_df.loc[:, 'NEITHER'] = probabilties[:, 1]
-
-        save_path = Path(save_path)
-        sub_df.to_csv(save_path / "sub_{}_{}.csv".format(str(round(score, 5)).replace('.', '_'),
-                                                          time.strftime("%Y%m%d-%H%M%S")),
-                                                        index=False)
+          save_path = Path(save_path)
+          sub_df.to_csv(save_path / "sub_{}_{}.csv".format(str(round(score, 5)).replace('.', '_'),
+                                                            time.strftime("%Y%m%d-%H%M%S")),
+                                                          index=False)
 
         return sub_df
       
@@ -123,7 +123,7 @@ class Model(BaseEstimator, ClassifierMixin):
                           seed=None,
                           verbose=0, 
                           return_probs=True,
-                          sub_sample_path='data/sample_submission_stage_1.csv',
+                          sub_sample_path='../data/sample_submission_stage_1.csv',
                           parallel=False,
                           exp_dir=None,
                           **parameters):
@@ -208,7 +208,7 @@ class Model(BaseEstimator, ClassifierMixin):
             print('Ensembled Test score: ', tst_score)
 
             self.save_probabilities(SUBMISSION_DIR, tst_probs, tst_score)
-            self.save_submission(sub_sample_path, SUBMISSION_DIR, probs, tst_score)
+            # self.save_submission(sub_sample_path, SUBMISSION_DIR, probs, tst_score)
         else:
             # we can make cv preds as test preds
             # wrapper is not aware of the cv splitting and can consider the whole data to be test data
@@ -232,7 +232,7 @@ class Model(BaseEstimator, ClassifierMixin):
                     n_folds=4,
                     return_probs=True,
                     exp_dir=None,
-                    sub_sample_path='data/sample_submission_stage_1.csv',
+                    sub_sample_path='../data/sample_submission_stage_1.csv',
                     parameters={}):
 
         exp_dir = Path(exp_dir) / 'ensembled_seeds'
@@ -296,7 +296,7 @@ class Model(BaseEstimator, ClassifierMixin):
         cols = ['{}_{}_{}'.format(cls, trial, fold) 
                           for trial in range(len(seeds)) 
                             for fold in range(n_folds) 
-                              for cls in ['A', 'B', 'NEITHER']]
+                              for cls in ['A', 'NEITHER']]
         self.save_probabilities(SUBMISSION_DIR, tst_probs, tst_score, cols=cols)
         self.save_submission(sub_sample_path, SUBMISSION_DIR, probs, tst_score, sub_df=sub_df)
         
@@ -390,7 +390,7 @@ class Model(BaseEstimator, ClassifierMixin):
                         for model_idx in range(len(lms))
                           for trial in range(len(seeds)) 
                             for fold in range(n_folds) 
-                              for cls in ['A', 'B', 'NEITHER']]
+                              for cls in ['A', 'NEITHER']]
         self.save_probabilities(SUBMISSION_DIR, tst_probs, tst_score, cols=cols)
         self.save_submission(sub_sample_path, SUBMISSION_DIR, probs, tst_score, sub_df=sub_df)
         

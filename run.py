@@ -197,7 +197,7 @@ def main():
                         type=str)
 
     parser.add_argument("--sub_sample_path",
-                        default=None,
+                        default="data/sample_submission_stage_1.csv",
                         type=str)
 
     parser.add_argument("--verbose",
