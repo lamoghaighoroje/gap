@@ -48,7 +48,7 @@ class Model(BaseEstimator, ClassifierMixin):
             sub_df = pd.read_csv(sample_path)
             if len(sub_df) != len(probabilties):
                 return sub_df
-        if sub_df != None:
+        if len(sub_df) > 0:
           sub_df.loc[:, 'A'] = probabilties[:, 0]
           # sub_df.loc[:, 'B'] = probabilties[:, 1]
           sub_df.loc[:, 'NEITHER'] = probabilties[:, 1]
