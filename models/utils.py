@@ -14,13 +14,13 @@ import neuralcoref
 from .base.utils import CoreNLPServer
 from nltk.parse.corenlp import CoreNLPParser
 
-from .pretrained.lee_et_al import LeeEtAl2017
-from .pretrained.huggingface import HuggingfaceCorefModel
-from .pretrained.allennlp import AllenNLPCorefModel
-from .pretrained.stanford import StanfordCorefModel
-from .heuristics.syntactic_distance import StanfordSyntacticDistanceModel
-from .heuristics.parallelism import AllenNLPParallelismModel as ParallelismModel
-from .heuristics.url_title import StanfordURLTitleModel as URLModel
+# from .pretrained.lee_et_al import LeeEtAl2017
+# from .pretrained.huggingface import HuggingfaceCorefModel
+# from .pretrained.allennlp import AllenNLPCorefModel
+# from .pretrained.stanford import StanfordCorefModel
+# from .heuristics.syntactic_distance import StanfordSyntacticDistanceModel
+# from .heuristics.parallelism import AllenNLPParallelismModel as ParallelismModel
+# from .heuristics.url_title import StanfordURLTitleModel as URLModel
 
 from .dataset import Dataset
 from .data_pipeline import data_pipeline
@@ -28,6 +28,14 @@ from .data_pipeline import data_pipeline
 logger= logging.getLogger("GAP")
 
 def init_coref_models(coref_models):
+    from .pretrained.lee_et_al import LeeEtAl2017
+    from .pretrained.huggingface import HuggingfaceCorefModel
+    from .pretrained.allennlp import AllenNLPCorefModel
+    from .pretrained.stanford import StanfordCorefModel
+    from .heuristics.syntactic_distance import StanfordSyntacticDistanceModel
+    from .heuristics.parallelism import AllenNLPParallelismModel as ParallelismModel
+    from .heuristics.url_title import StanfordURLTitleModel as URLModel
+    
     SPACY_MODEL = spacy.load('en_core_web_lg')
 
     model_url = 'externals/data/coref-model-2018.02.05.tar.gz'
