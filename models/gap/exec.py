@@ -33,12 +33,14 @@ from .probert import ProBERT
 from .grep import GREP
 
 from scipy.special import softmax
+from torch.utils.tensorboard import SummaryWriter
 
 logging.basicConfig(format = '%(asctime)s - %(levelname)s - %(name)s -   %(message)s',
                     datefmt = '%m/%d/%Y %H:%M:%S',
                     filename= 'exec.log',
                     level = logging.INFO)
 logger = logging.getLogger(__name__)
+writer = SummaryWriter('.')
 
 def simple_accuracy(preds, labels):
     return (preds == labels).mean()
@@ -346,7 +348,13 @@ def fit(model,
                                         args.eval_batch_size, 
                                         label_list,
                                         num_labels)
-
+            
+            writer.add_scalar("train_loss", np.mean(tr_loss/nb_tr_steps), epoch)
+            writer.add_scalar("validation_loss", np.mean(score), epoch)
+            writer.add_scalar("accuracy", np.mean(res['acc']), epoch)
+            writer.add_scalar("f1", np.mean(res['f1']), epoch)
+            writer.add_scalar("acc_f1", np.mean(res['acc_and_f1']), epoch)
+           
             pbar.set_description('Trn {:2d}, Loss={:.3f}, Val score={:.3f} F1={:.3f}, Test score={:.3f}'.format(epoch, 
                                                                                 tr_loss/nb_tr_steps, 
                                                                                 score,
@@ -386,6 +394,8 @@ def fit(model,
                                                                                     tst_res['log_loss'],
                                                                                     tst_res['f1']
                                                                                     ))
+                    writer.add_scalar("test_loss", np.mean(tst_res['log_loss']), epoch)
+                    writer.add_scalar("test_f1", np.mean(tst_res['f1']), epoch)
                     pbar.update(len(test_features))
 
                     # score = tst_score
@@ -409,7 +419,7 @@ def fit(model,
 
             if since_best == args.patience:
                 break
-
+            writer.flush()
     return best_epoch, preds, best_score, tst_preds, tst_score, None
 
 def init_model(X_trn,
